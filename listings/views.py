@@ -3,6 +3,7 @@ from django.db.models import Prefetch
 from .models import HotelRoom, Listing, HotelRoomType, ReservationInfo
 from .serializers import HotelRoomSerializer, ListingSerializer, HotelRoomTypeSerializer, ReservationInfoSerializer
 from django.shortcuts import get_object_or_404
+from datetime import datetime
 
 
 def get_all_lists(request):
@@ -57,5 +58,12 @@ def get_specific_reservation(request, pk):
     return JsonResponse(reservation_serializer.data, safe=False)
 
 
-def get_reservation_by_filters(request, pk):
-    None
+def get_reservation_by_filters(request):
+    max_price = request.GET.get('max_price')
+    check_out = request.GET.get('check_out')
+    check_out_formatted = datetime.fromisoformat(check_out).isoformat()
+
+    queryset = ReservationInfo.objects.filter(
+        booking__price__lte=max_price, checkin__lt=check_out_formatted)
+    reservation_serializer = ReservationInfoSerializer(queryset, many=True)
+    return JsonResponse(reservation_serializer.data, safe=False)

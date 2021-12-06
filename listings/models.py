@@ -85,10 +85,10 @@ class BookingInfo(models.Model):
 class ReservationInfo(models.Model):
     booking = models.OneToOneField(
         BookingInfo, blank=True, null=True, on_delete=models.CASCADE, related_name="reservation_info")
-    check_in = models.DateTimeField()
-    check_out = models.DateTimeField()
+    checkin = models.DateTimeField()
+    checkout = models.DateTimeField()
 
     def __str__(self):
         if self.booking:
             obj = self.booking
-        return f'{obj} {self.check_in} {self.check_in}'
+        return f'{obj} {self.checkin} {self.checkout}'
