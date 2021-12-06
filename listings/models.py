@@ -1,6 +1,9 @@
 from django.db import models
 
 
+# A Table that have list of all the Apartment/hotel in our system, with meta-data
+# i.e their Name, Country and City
+# Admin can update these listing on the frontend, But the user cannot
 class Listing(models.Model):
     HOTEL = 'hotel'
     APARTMENT = 'apartment'
@@ -22,6 +25,8 @@ class Listing(models.Model):
         return self.title
 
 
+# Wrapper around Listing
+# Contains Title of Hotel Room and Its Type [apartment, hotel] etc
 class HotelRoomType(models.Model):
     hotel = models.ForeignKey(
         Listing,
@@ -36,6 +41,7 @@ class HotelRoomType(models.Model):
         return f'{self.hotel} - {self.title}'
 
 
+# Abstract representation of Hotel-Room in our System
 class HotelRoom(models.Model):
     hotel_room_type = models.ForeignKey(
         HotelRoomType,
@@ -51,7 +57,7 @@ class HotelRoom(models.Model):
 
 
 class BookingInfo(models.Model):
-    listing = models.OneToOneField(
+    listing = models.ForeignKey(
         Listing,
         blank=True,
         null=True,
@@ -74,3 +80,15 @@ class BookingInfo(models.Model):
             obj = self.hotel_room_type
 
         return f'{obj} {self.price}'
+
+
+class ReservationInfo(models.Model):
+    booking = models.OneToOneField(
+        BookingInfo, blank=True, null=True, on_delete=models.CASCADE, related_name="reservation_info")
+    check_in = models.DateTimeField()
+    check_out = models.DateTimeField()
+
+    def __str__(self):
+        if self.booking:
+            obj = self.booking
+        return f'{obj} {self.check_in} {self.check_in}'
